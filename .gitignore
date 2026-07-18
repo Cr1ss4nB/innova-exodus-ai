@@ -28,10 +28,7 @@ backend/data/uploads/*
 !backend/data/uploads/.gitkeep
 backend/data/vector_store/*
 !backend/data/vector_store/.gitkeep
-.sqlite3
-# Base vectorial
-faiss_index/ 
-uploads/
+*.sqlite3
 .cache/
 *.pid
 # Jupyter
