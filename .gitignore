@@ -1,0 +1,33 @@
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg-info/
+.venv/
+venv/
+env/
+.env
+.env.*
+!.env.example
+logs/
+*.log
+.coverage
+htmlcov/
+.pytest_cache/
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+node_modules/
+dist/
+build/
+*.tmp
+*.temp
+# Base vectorial
+faiss_index/ 
+uploads/
+.cache/
+*.pid
+# Jupyter
+.ipynb_checkpoints/
