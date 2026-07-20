@@ -12,6 +12,9 @@ class Settings(BaseSettings):
     model_name: str = "gemini-3.1-flash-lite"
     app_name: str = "Innova Exodus Assistant"
 
+    embedding_model: str = "gemini-embedding-001"
+    embedding_dimension: int = 768
+
     host: str = "0.0.0.0"
     port: int = 8000
 
@@ -22,6 +25,8 @@ class Settings(BaseSettings):
     top_k: int = 5
 
     cors_origins: str = "http://localhost:5500"
+
+    vector_store_dir: str = "data/vector_store"
 
     @property
     def cors_origins_list(self) -> list[str]:
