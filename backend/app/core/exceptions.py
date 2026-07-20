@@ -24,3 +24,11 @@ class InvalidUploadError(DocumentProcessingError):
 
 class DocumentNotFoundError(DocumentProcessingError):
     """No existe un documento registrado con el id solicitado."""
+
+
+class ChatError(Exception):
+    """Error base para fallos durante el flujo de consulta del chat."""
+
+
+class LLMGenerationError(ChatError):
+    """Fallo al generar una respuesta con el modelo de lenguaje."""

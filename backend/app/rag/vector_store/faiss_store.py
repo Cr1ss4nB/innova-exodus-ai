@@ -104,6 +104,30 @@ class FaissVectorStore:
         self.save()
         return len(ids_to_remove)
 
+    def similarity_search(self, query_vector: list[float], top_k: int) -> list[dict]:
+        """Busca los fragmentos más similares a un vector de consulta y retorna su metadata."""
+        if self._index.ntotal == 0:
+            return []
+
+        query = np.array([query_vector], dtype="float32")
+        k = min(top_k, self._index.ntotal)
+
+        try:
+            distances, ids = self._index.search(query, k)
+        except Exception as error:
+            raise VectorStoreError("No se pudo realizar la búsqueda semántica en el índice FAISS") from error
+
+        results: list[dict] = []
+        for vector_id, distance in zip(ids[0].tolist(), distances[0].tolist()):
+            if vector_id == -1:
+                continue
+            metadata = self._metadata.get(vector_id)
+            if metadata is None:
+                continue
+            results.append({**metadata, "distance": distance})
+
+        return results
+
     @property
     def total_vectors(self) -> int:
         return self._index.ntotal

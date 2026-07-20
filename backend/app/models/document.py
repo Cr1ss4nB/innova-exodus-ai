@@ -42,3 +42,14 @@ class DocumentRecord:
     total_pages: int
     total_chunks: int
     size_bytes: int
+
+
+@dataclass
+class RetrievedChunk:
+    """Fragmento recuperado del vector store junto con su score de similitud."""
+
+    document_id: str
+    filename: str
+    page_number: int
+    text: str
+    distance: float
