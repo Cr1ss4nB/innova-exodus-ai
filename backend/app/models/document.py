@@ -42,6 +42,7 @@ class DocumentRecord:
     total_pages: int
     total_chunks: int
     size_bytes: int
+    file_hash: str
 
 
 @dataclass

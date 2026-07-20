@@ -3,10 +3,12 @@ import uuid
 from datetime import datetime, timezone
 
 from app.core.config import get_settings
+from app.core.exceptions import DuplicateDocumentError
 from app.models.document import DocumentRecord
 from app.rag.vector_store.faiss_store import get_vector_store
 from app.services.document_processing_service import process_document
 from app.services.document_registry_service import get_document_registry
+from app.utils.file_hashing import compute_sha256
 from app.utils.file_storage import delete_file, save_file_bytes
 from app.utils.file_validation import validate_pdf_upload
 
@@ -23,6 +25,15 @@ def upload_document(filename: str, content_type: str | None, content: bytes) -> 
         file_size=len(content),
         max_size_mb=settings.max_upload_size_mb,
     )
+
+    file_hash = compute_sha256(content)
+    registry = get_document_registry()
+
+    existing = registry.find_by_hash(file_hash)
+    if existing is not None:
+        raise DuplicateDocumentError(
+            f"Este documento ya fue registrado como '{existing.filename}' (id={existing.document_id})"
+        )
 
     document_id = str(uuid.uuid4())
     stored_filename = f"{document_id}.pdf"
@@ -44,9 +55,10 @@ def upload_document(filename: str, content_type: str | None, content: bytes) -> 
         total_pages=result.total_pages,
         total_chunks=result.total_chunks,
         size_bytes=len(content),
+        file_hash=file_hash,
     )
 
-    get_document_registry().add(record)
+    registry.add(record)
     logger.info("Documento registrado y disponible para consulta: %s (%s)", filename, document_id)
 
     return record

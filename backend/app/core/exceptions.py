@@ -26,6 +26,10 @@ class DocumentNotFoundError(DocumentProcessingError):
     """No existe un documento registrado con el id solicitado."""
 
 
+class DuplicateDocumentError(DocumentProcessingError):
+    """Ya existe un documento registrado con el mismo contenido (hash)."""
+
+
 class ChatError(Exception):
     """Error base para fallos durante el flujo de consulta del chat."""
 

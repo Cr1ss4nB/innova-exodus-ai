@@ -5,8 +5,11 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.v1.router import router as v1_router
 from app.core.config import get_settings
+from app.core.error_handlers import domain_error_handler
+from app.core.exceptions import ChatError, DocumentProcessingError
 from app.core.logging import configure_logging
 from app.rag.vector_store.faiss_store import get_vector_store
+from app.services.document_registry_service import get_document_registry
 
 configure_logging()
 
@@ -15,8 +18,9 @@ settings = get_settings()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Carga el índice FAISS existente (si lo hay) al iniciar la aplicación."""
+    """Carga el índice FAISS y el registro de documentos existentes al iniciar la aplicación."""
     get_vector_store()
+    get_document_registry()
     yield
 
 
@@ -29,6 +33,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.add_exception_handler(DocumentProcessingError, domain_error_handler)
+app.add_exception_handler(ChatError, domain_error_handler)
 
 app.include_router(v1_router)
 

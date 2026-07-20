@@ -8,6 +8,7 @@ from pathlib import Path
 from app.core.config import get_settings
 from app.core.exceptions import DocumentNotFoundError
 from app.models.document import DocumentRecord
+from app.utils.file_hashing import compute_sha256
 
 logger = logging.getLogger(__name__)
 
@@ -29,6 +30,33 @@ class DocumentRegistry:
         self._documents = payload.get("documents", {})
         logger.info("Registro de documentos cargado con %d documentos", len(self._documents))
 
+        self._migrate_missing_hashes()
+
+    def _migrate_missing_hashes(self) -> None:
+        """Calcula el hash de los documentos registrados antes de que existiera esta validación."""
+        settings = get_settings()
+        migrated = 0
+
+        for document_id, data in self._documents.items():
+            if data.get("file_hash"):
+                continue
+
+            file_path = settings.uploads_path / data["stored_filename"]
+            if not file_path.exists():
+                logger.warning(
+                    "No se pudo migrar el hash del documento %s: archivo no encontrado (%s)",
+                    document_id,
+                    file_path,
+                )
+                continue
+
+            data["file_hash"] = compute_sha256(file_path.read_bytes())
+            migrated += 1
+
+        if migrated:
+            logger.info("Migración automática: se calculó el hash de %d documento(s) existentes", migrated)
+            self._save()
+
     def _save(self) -> None:
         self.registry_path.parent.mkdir(parents=True, exist_ok=True)
         payload = {"documents": self._documents}
@@ -47,6 +75,13 @@ class DocumentRegistry:
         if data is None:
             raise DocumentNotFoundError(f"No existe un documento con id: {document_id}")
         return self._to_record(data)
+
+    def find_by_hash(self, file_hash: str) -> DocumentRecord | None:
+        """Retorna el documento registrado con el hash dado, o None si no existe."""
+        for data in self._documents.values():
+            if data.get("file_hash") == file_hash:
+                return self._to_record(data)
+        return None
 
     def list_all(self) -> list[DocumentRecord]:
         """Retorna todos los documentos registrados."""
@@ -70,6 +105,7 @@ class DocumentRegistry:
             total_pages=data["total_pages"],
             total_chunks=data["total_chunks"],
             size_bytes=data["size_bytes"],
+            file_hash=data.get("file_hash", ""),
         )
 
 
