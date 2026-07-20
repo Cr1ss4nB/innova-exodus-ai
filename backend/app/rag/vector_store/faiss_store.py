@@ -84,6 +84,26 @@ class FaissVectorStore:
         self._next_id += len(chunks)
         self.save()
 
+    def remove_by_document_id(self, document_id: str) -> int:
+        """Elimina del índice todos los vectores asociados a un documento y retorna cuántos se eliminaron."""
+        ids_to_remove = [
+            vector_id for vector_id, data in self._metadata.items() if data["document_id"] == document_id
+        ]
+
+        if not ids_to_remove:
+            return 0
+
+        try:
+            self._index.remove_ids(np.array(ids_to_remove, dtype="int64"))
+        except Exception as error:
+            raise VectorStoreError(f"No se pudieron eliminar los vectores del documento {document_id}") from error
+
+        for vector_id in ids_to_remove:
+            del self._metadata[vector_id]
+
+        self.save()
+        return len(ids_to_remove)
+
     @property
     def total_vectors(self) -> int:
         return self._index.ntotal
@@ -93,4 +113,4 @@ class FaissVectorStore:
 def get_vector_store() -> FaissVectorStore:
     """Retorna la instancia del vector store, cacheada por proceso."""
     settings = get_settings()
-    return FaissVectorStore(index_dir=Path(settings.vector_store_dir), dimension=settings.embedding_dimension)
+    return FaissVectorStore(index_dir=settings.vector_store_path, dimension=settings.embedding_dimension)

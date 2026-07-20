@@ -16,3 +16,11 @@ class EmbeddingGenerationError(DocumentProcessingError):
 
 class VectorStoreError(DocumentProcessingError):
     """Error al operar sobre el índice vectorial FAISS."""
+
+
+class InvalidUploadError(DocumentProcessingError):
+    """El archivo subido no cumple con las restricciones de carga permitidas."""
+
+
+class DocumentNotFoundError(DocumentProcessingError):
+    """No existe un documento registrado con el id solicitado."""

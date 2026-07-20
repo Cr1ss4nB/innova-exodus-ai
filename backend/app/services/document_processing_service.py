@@ -1,5 +1,4 @@
 import logging
-import uuid
 from pathlib import Path
 
 from app.core.config import get_settings
@@ -13,10 +12,9 @@ from app.rag.vector_store.faiss_store import get_vector_store
 logger = logging.getLogger(__name__)
 
 
-def process_document(file_path: Path, original_filename: str) -> ProcessingResult:
+def process_document(file_path: Path, original_filename: str, document_id: str) -> ProcessingResult:
     """Extrae, divide, genera embeddings e indexa un PDF en el vector store."""
     settings = get_settings()
-    document_id = str(uuid.uuid4())
 
     logger.info("Procesando documento '%s' (document_id=%s)", original_filename, document_id)
 
