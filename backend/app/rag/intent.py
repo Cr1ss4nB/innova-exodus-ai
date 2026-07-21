@@ -2,26 +2,10 @@ import re
 import unicodedata
 
 GREETING_PHRASES = {
-    "hola",
-    "buenas",
-    "buenos dias",
-    "buenos días",
-    "buenas tardes",
-    "buenas noches",
-    "buen dia",
-    "que tal",
-    "como estas",
-    "hey",
-    "gracias",
-    "muchas gracias",
-    "mil gracias",
-    "de nada",
-    "adios",
-    "hasta luego",
-    "nos vemos",
-    "chao",
-    "hasta pronto",
-    "nos vemos pronto",
+    "hola", "buenas", "buenos dias", "buenas tardes", "buenas noches", "buen dia", "que tal", "como estas", "hey", "gracias",
+    "muchas gracias", "mil gracias", "de nada", "adios", "hasta luego", "nos vemos", "chao", "necesito ayuda", "que onda",
+    "tengo una duda", "tengo una pregunta", "puedes ayudarme", "ayuda por favor", "soporte", "asistencia", "hola hola""buenas buenas", "holis", 
+    "holi", "que mas", "como va", "como vais", "que hay", "aló"
 }
 
 
@@ -35,5 +19,12 @@ def _normalize(text: str) -> str:
 
 
 def is_greeting(message: str) -> bool:
-    """Detecta si un mensaje es únicamente un saludo o cortesía, sin contenido de consulta."""
-    return _normalize(message) in GREETING_PHRASES
+    """Detecta si un mensaje es únicamente un saludo o cortesía, incluso si combina
+    varias frases de saludo separadas por coma (por ejemplo, "Hola, buenos días")."""
+    segments = [segment.strip() for segment in message.split(",")]
+    segments = [segment for segment in segments if segment]
+
+    if not segments:
+        return False
+
+    return all(_normalize(segment) in GREETING_PHRASES for segment in segments)
