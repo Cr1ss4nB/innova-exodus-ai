@@ -20,7 +20,7 @@ function setupLogo() {
   const fallback = qs('#brand-logo-fallback');
   fallback.textContent = initials('Innova Exodus');
 
-  const candidates = ['assets/logo.png', 'assets/logo.jpg'];
+  const candidates = ['assets/logo.png', 'assets/logo.svg', 'assets/logo.jpg'];
   let index = 0;
 
   const tryNext = () => {
