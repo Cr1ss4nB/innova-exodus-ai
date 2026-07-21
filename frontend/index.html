@@ -33,7 +33,9 @@
 
       <div class="sidebar-section-header">
         <h2>Documentos</h2>
-        <button class="btn btn-primary" id="upload-trigger" type="button">Subir PDF</button>
+        <button class="btn btn-primary" id="upload-trigger" type="button">
+          <span aria-hidden="true">⬆</span> Subir PDF
+        </button>
         <input type="file" id="file-input" accept="application/pdf,.pdf" hidden />
       </div>
 
@@ -43,6 +45,12 @@
         <div class="empty-state-icon">📁</div>
         <p class="empty-state-title">Aún no hay documentos</p>
         <p class="empty-state-hint">Sube un PDF para que el asistente pueda responder con base en él.</p>
+      </div>
+
+      <div class="sidebar-footer">
+        <button class="btn btn-ghost btn-block" id="clear-chat" type="button">
+          <span aria-hidden="true">🧹</span> Limpiar conversación
+        </button>
       </div>
     </aside>
 
@@ -57,11 +65,11 @@
 
       <div class="chat-window" id="chat-window">
         <div class="chat-empty" id="chat-empty">
-          <div class="chat-empty-icon">💬</div>
-          <p class="chat-empty-title">Pregúntame algo</p>
+          <div class="chat-empty-icon">✨</div>
+          <p class="chat-empty-title">¿En qué puedo ayudarte hoy?</p>
           <p class="chat-empty-hint">
-            Puedo responder preguntas sobre la documentación interna de Innova Exodus,
-            citando el documento y la página exactos.
+            Pregúntame sobre la documentación interna de Innova Exodus — te responderé citando
+            el documento y la página exactos en los que se basa cada respuesta.
           </p>
         </div>
       </div>
@@ -74,7 +82,9 @@
           rows="1"
           aria-label="Escribe tu pregunta"
         ></textarea>
-        <button class="btn-send" id="send-button" type="submit">Enviar</button>
+        <button class="btn-send" id="send-button" type="submit" aria-label="Enviar pregunta">
+          <span aria-hidden="true">➤</span>
+        </button>
       </form>
     </main>
   </div>

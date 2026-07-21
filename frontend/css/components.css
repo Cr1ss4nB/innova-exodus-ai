@@ -7,7 +7,7 @@
   border-radius: var(--radius-pill);
   font-size: 13px;
   font-weight: 500;
-  transition: background 0.15s ease, color 0.15s ease;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
 }
 
 .btn-primary {
@@ -27,6 +27,7 @@
 
 .btn-ghost:hover:not(:disabled) {
   background: var(--color-surface-alt);
+  color: var(--color-ink);
 }
 
 .btn-danger {
@@ -35,7 +36,7 @@
 }
 
 .btn-danger:hover:not(:disabled) {
-  background: #a3402f;
+  background: #c85647;
 }
 
 /* Toasts */
@@ -77,12 +78,13 @@
 
 .toast--success {
   background: var(--color-success);
-  color: #fff;
+  color: #12151c;
 }
 
 .toast--info {
-  background: var(--color-ink);
-  color: #fff;
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border-strong);
+  color: var(--color-ink);
 }
 
 /* Dialogo de confirmacion */
@@ -92,11 +94,13 @@ dialog.confirm-dialog {
   padding: var(--space-6);
   max-width: 340px;
   width: calc(100% - 48px);
+  background: var(--color-surface);
+  color: var(--color-ink);
   box-shadow: var(--shadow-md);
 }
 
 dialog.confirm-dialog::backdrop {
-  background: rgba(27, 36, 64, 0.4);
+  background: rgba(0, 0, 0, 0.6);
 }
 
 .confirm-title {

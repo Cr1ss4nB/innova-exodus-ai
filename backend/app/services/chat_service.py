@@ -1,19 +1,39 @@
 import logging
 
 from app.models.chat import ChatAnswer, ChatSource
+from app.prompts.farewell_prompt import GOODBYE_RESPONSE, GRATITUDE_RESPONSE
 from app.prompts.greeting_prompt import GREETING_RESPONSE
-from app.prompts.system_prompt import INSUFFICIENT_INFO_MARKER
+from app.prompts.system_prompt import INSUFFICIENT_INFO_MARKER, INSUFFICIENT_INFO_RESPONSE
 from app.rag.chain import answer_question
-from app.rag.intent import is_greeting
+from app.rag.intent import classify_intent
+from app.rag.vector_store.faiss_store import get_vector_store
 
 logger = logging.getLogger(__name__)
 
+_CANNED_RESPONSES = {
+    "greeting": GREETING_RESPONSE,
+    "gratitude": GRATITUDE_RESPONSE,
+    "goodbye": GOODBYE_RESPONSE,
+}
+
 
 def ask(question: str) -> ChatAnswer:
-    """Ejecuta el flujo de chat: responde saludos directamente o ejecuta el flujo RAG completo."""
-    if is_greeting(question):
-        logger.info("Mensaje detectado como saludo o cortesía, se responde sin consultar FAISS")
-        return ChatAnswer(answer=GREETING_RESPONSE, sources=[])
+    """Ejecuta el flujo de chat: solo las preguntas reales consultan FAISS y Gemini.
+
+    Saludos, agradecimientos y despedidas se responden con reglas simples, sin tocar el
+    índice ni el modelo de lenguaje. Cualquier otro mensaje se trata como una pregunta real
+    y sigue el pipeline RAG completo (embedding de la pregunta, búsqueda en FAISS, construcción
+    del prompt y generación con Gemini), exactamente igual que antes.
+    """
+    intent = classify_intent(question)
+
+    if intent in _CANNED_RESPONSES:
+        logger.info("Mensaje clasificado como '%s', se responde sin consultar FAISS ni Gemini", intent)
+        return ChatAnswer(answer=_CANNED_RESPONSES[intent], sources=[])
+
+    if get_vector_store().total_vectors == 0:
+        logger.info("No hay documentos indexados en FAISS, se responde sin consultar al modelo")
+        return ChatAnswer(answer=INSUFFICIENT_INFO_RESPONSE, sources=[])
 
     answer, chunks = answer_question(question)
 

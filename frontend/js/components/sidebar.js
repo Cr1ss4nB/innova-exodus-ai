@@ -8,6 +8,7 @@ import {
   setDocumentsError,
   removeDocument,
 } from '../state/documentsStore.js';
+import { clearMessages } from '../state/chatStore.js';
 import { renderDocumentItem } from './documentItem.js';
 import { handleUpload } from './uploader.js';
 import { confirmAction } from './confirmDialog.js';
@@ -20,7 +21,7 @@ function setupLogo() {
   const fallback = qs('#brand-logo-fallback');
   fallback.textContent = initials('Innova Exodus');
 
-  const candidates = ['assets/logo.png', 'assets/logo.svg', 'assets/logo.jpg'];
+  const candidates = ['assets/logo.png', 'assets/logo.jpg'];
   let index = 0;
 
   const tryNext = () => {
@@ -111,6 +112,23 @@ function setupUpload() {
   });
 }
 
+function setupClearChat() {
+  const button = qs('#clear-chat');
+
+  button.addEventListener('click', async () => {
+    const confirmed = await confirmAction({
+      title: 'Limpiar conversación',
+      message: 'Se vaciará el historial mostrado en pantalla. Los documentos y el índice no se ven afectados.',
+      confirmLabel: 'Limpiar',
+    });
+
+    if (!confirmed) return;
+
+    clearMessages();
+    showToast('Conversación reiniciada.', 'info');
+  });
+}
+
 function setupDrawer() {
   const app = qs('#app');
   const sidebar = qs('#sidebar');
@@ -136,6 +154,7 @@ function setupDrawer() {
 export async function initSidebar() {
   setupLogo();
   setupUpload();
+  setupClearChat();
   setupDrawer();
   subscribeDocuments(renderDocuments);
 

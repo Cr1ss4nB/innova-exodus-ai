@@ -85,13 +85,23 @@ class FaissVectorStore:
         self.save()
 
     def remove_by_document_id(self, document_id: str) -> int:
-        """Elimina del índice todos los vectores asociados a un documento y retorna cuántos se eliminaron."""
+        """Elimina del índice todos los vectores asociados a un documento y retorna cuántos se eliminaron.
+
+        Cuando tras la eliminación no queda ningún chunk registrado, el índice se reconstruye
+        completamente desde cero en vez de confiar únicamente en la resta incremental de FAISS,
+        para garantizar de forma determinista que no quede ningún vector residual. Para
+        eliminaciones parciales, se verifica explícitamente que el conteo de vectores haya
+        bajado lo esperado; si no coincide, se falla de forma explícita en vez de continuar
+        con un índice potencialmente inconsistente.
+        """
         ids_to_remove = [
             vector_id for vector_id, data in self._metadata.items() if data["document_id"] == document_id
         ]
 
         if not ids_to_remove:
             return 0
+
+        total_before = self._index.ntotal
 
         try:
             self._index.remove_ids(np.array(ids_to_remove, dtype="int64"))
@@ -100,6 +110,18 @@ class FaissVectorStore:
 
         for vector_id in ids_to_remove:
             del self._metadata[vector_id]
+
+        if not self._metadata:
+            self._index = faiss.IndexIDMap2(faiss.IndexFlatL2(self.dimension))
+            self._next_id = 0
+            logger.info("No quedan documentos registrados: el índice FAISS se reconstruyó vacío")
+        else:
+            expected_total = total_before - len(ids_to_remove)
+            if self._index.ntotal != expected_total:
+                raise VectorStoreError(
+                    f"La eliminación de vectores no se reflejó correctamente en el índice "
+                    f"(esperados {expected_total}, actuales {self._index.ntotal})"
+                )
 
         self.save()
         return len(ids_to_remove)

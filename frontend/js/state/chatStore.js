@@ -36,6 +36,14 @@ export function setThinking(isThinking) {
   notify();
 }
 
+/**
+ * Vacia el historial visual de la conversacion. No afecta documentos, FAISS ni el backend.
+ */
+export function clearMessages() {
+  state = { ...state, messages: [], isThinking: false };
+  notify();
+}
+
 export function createMessageId() {
   return typeof crypto !== 'undefined' && crypto.randomUUID
     ? crypto.randomUUID()
