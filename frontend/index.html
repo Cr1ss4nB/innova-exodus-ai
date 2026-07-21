@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Innova Exodus — Asistente corporativo</title>
+  <link rel="stylesheet" href="css/tokens.css" />
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/layout.css" />
+  <link rel="stylesheet" href="css/sidebar.css" />
+  <link rel="stylesheet" href="css/chat.css" />
+  <link rel="stylesheet" href="css/components.css" />
+</head>
+<body>
+  <div class="app" id="app">
+    <div class="backdrop" id="backdrop"></div>
+
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-brand">
+        <img id="brand-logo" class="brand-logo" alt="Logo de Innova Exodus" hidden />
+        <div id="brand-logo-fallback" class="brand-logo-fallback"></div>
+        <div class="brand-text">
+          <h1 class="brand-name">Innova Exodus</h1>
+          <p class="brand-tagline">Base de conocimiento interna</p>
+        </div>
+        <button class="menu-toggle sidebar-close" id="sidebar-close" type="button" aria-label="Cerrar panel de documentos">✕</button>
+      </div>
+
+      <div class="status-row">
+        <span class="status-dot" id="status-dot"></span>
+        <span id="status-text">Comprobando conexión…</span>
+      </div>
+
+      <div class="sidebar-section-header">
+        <h2>Documentos</h2>
+        <button class="btn btn-primary" id="upload-trigger" type="button">Subir PDF</button>
+        <input type="file" id="file-input" accept="application/pdf,.pdf" hidden />
+      </div>
+
+      <ul class="document-list" id="document-list"></ul>
+
+      <div class="empty-state" id="document-empty" hidden>
+        <div class="empty-state-icon">📁</div>
+        <p class="empty-state-title">Aún no hay documentos</p>
+        <p class="empty-state-hint">Sube un PDF para que el asistente pueda responder con base en él.</p>
+      </div>
+    </aside>
+
+    <main class="chat-panel">
+      <header class="chat-header">
+        <button class="menu-toggle" id="menu-open" type="button" aria-label="Abrir panel de documentos">☰</button>
+        <div>
+          <h2 class="chat-title">Asistente Innova Exodus</h2>
+          <p class="chat-subtitle">Respuestas basadas en la documentación interna</p>
+        </div>
+      </header>
+
+      <div class="chat-window" id="chat-window">
+        <div class="chat-empty" id="chat-empty">
+          <div class="chat-empty-icon">💬</div>
+          <p class="chat-empty-title">Pregúntame algo</p>
+          <p class="chat-empty-hint">
+            Puedo responder preguntas sobre la documentación interna de Innova Exodus,
+            citando el documento y la página exactos.
+          </p>
+        </div>
+      </div>
+
+      <form class="chat-input-row" id="chat-form">
+        <textarea
+          id="chat-input"
+          class="chat-textarea"
+          placeholder="Escribe tu pregunta…"
+          rows="1"
+          aria-label="Escribe tu pregunta"
+        ></textarea>
+        <button class="btn-send" id="send-button" type="submit">Enviar</button>
+      </form>
+    </main>
+  </div>
+
+  <div class="toast-container" id="toast-container"></div>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

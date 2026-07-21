@@ -28,6 +28,7 @@ backend/data/uploads/*
 !backend/data/uploads/.gitkeep
 backend/data/vector_store/*
 !backend/data/vector_store/.gitkeep
+backend/data/documents_registry.json
 *.sqlite3
 .cache/
 *.pid
