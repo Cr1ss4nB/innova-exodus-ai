@@ -1,7 +1,13 @@
 from fastapi import APIRouter, File, UploadFile, status
+from fastapi.responses import FileResponse
 
 from app.schemas.document_schemas import DocumentDeleteResponse, DocumentListResponse, DocumentResponse
-from app.services.document_service import delete_document, list_documents, upload_document
+from app.services.document_service import (
+    delete_document,
+    get_document_file_path,
+    list_documents,
+    upload_document,
+)
 
 router = APIRouter(prefix="/documents")
 
@@ -25,6 +31,17 @@ def list_documents_endpoint() -> DocumentListResponse:
     return DocumentListResponse(
         documents=[DocumentResponse.from_record(record) for record in records],
         total=len(records),
+    )
+
+
+@router.get("/{document_id}/view")
+def view_document_endpoint(document_id: str) -> FileResponse:
+    """Sirve el PDF original para visualizarlo en el navegador, sin forzar su descarga."""
+    file_path, filename = get_document_file_path(document_id)
+    return FileResponse(
+        path=file_path,
+        media_type="application/pdf",
+        headers={"Content-Disposition": f'inline; filename="{filename}"'},
     )
 
 

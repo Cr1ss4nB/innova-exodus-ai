@@ -1,9 +1,10 @@
 import logging
 import uuid
 from datetime import datetime, timezone
+from pathlib import Path
 
 from app.core.config import get_settings
-from app.core.exceptions import DuplicateDocumentError
+from app.core.exceptions import DocumentNotFoundError, DuplicateDocumentError
 from app.models.document import DocumentRecord
 from app.rag.vector_store.faiss_store import get_vector_store
 from app.services.document_processing_service import process_document
@@ -89,3 +90,14 @@ def delete_document(document_id: str) -> tuple[DocumentRecord, int]:
     )
 
     return record, vectors_removed
+
+
+def get_document_file_path(document_id: str) -> tuple[Path, str]:
+    """Retorna la ruta física y el nombre original de un documento, para visualizarlo."""
+    record = get_document_registry().get(document_id)
+    file_path = get_settings().uploads_path / record.stored_filename
+
+    if not file_path.exists():
+        raise DocumentNotFoundError(f"El archivo físico del documento no se encontró en disco: {document_id}")
+
+    return file_path, record.filename

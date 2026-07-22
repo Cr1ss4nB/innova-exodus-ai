@@ -5,4 +5,5 @@ export const API_ROUTES = {
   health: `${API_BASE_URL}/api/v1/health`,
   documents: `${API_BASE_URL}/api/v1/documents`,
   chat: `${API_BASE_URL}/api/v1/chat`,
+  documentView: (documentId) => `${API_BASE_URL}/api/v1/documents/${documentId}/view`,
 };
