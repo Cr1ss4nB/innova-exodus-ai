@@ -1,6 +1,13 @@
 import { qs } from '../utils/dom.js';
 import { sendMessage } from '../services/apiClient.js';
-import { addMessage, setThinking, createMessageId, getChatState, subscribeChat } from '../state/chatStore.js';
+import {
+  addMessage,
+  setThinking,
+  createMessageId,
+  getChatState,
+  getRecentHistory,
+  subscribeChat,
+} from '../state/chatStore.js';
 import { showToast } from './toast.js';
 
 function autoResize(textarea) {
@@ -12,13 +19,15 @@ async function submitQuestion(textarea) {
   const question = textarea.value.trim();
   if (!question || getChatState().isThinking) return;
 
+  const history = getRecentHistory(3);
+
   addMessage({ id: createMessageId(), role: 'user', text: question });
   textarea.value = '';
   autoResize(textarea);
   setThinking(true);
 
   try {
-    const result = await sendMessage(question);
+    const result = await sendMessage(question, history);
     addMessage({ id: createMessageId(), role: 'assistant', text: result.answer, sources: result.sources });
   } catch (error) {
     const message = error.message || 'No se pudo obtener una respuesta del asistente.';

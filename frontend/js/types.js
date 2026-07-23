@@ -15,6 +15,12 @@
  */
 
 /**
+ * @typedef {Object} ChatHistoryTurn
+ * @property {string} question
+ * @property {string} answer
+ */
+
+/**
  * @typedef {Object} ChatMessage
  * @property {string} id
  * @property {'user'|'assistant'|'error'} role

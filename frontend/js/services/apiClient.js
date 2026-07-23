@@ -56,15 +56,17 @@ export async function deleteDocument(documentId) {
 }
 
 /**
- * Envia una pregunta al asistente.
+ * Envia una pregunta al asistente, junto con un historial corto y efimero de la conversacion
+ * actual (nunca se persiste en el backend).
  * @param {string} question
+ * @param {import('../types.js').ChatHistoryTurn[]} [history]
  * @returns {Promise<{answer: string, sources: import('../types.js').SourceReference[]}>}
  */
-export async function sendMessage(question) {
+export async function sendMessage(question, history = []) {
   const response = await fetch(API_ROUTES.chat, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ question }),
+    body: JSON.stringify({ question, history }),
   });
 
   if (!response.ok) throw await toApiError(response);
