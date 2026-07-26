@@ -1,6 +1,6 @@
 import { qs, clearChildren } from '../utils/dom.js';
 import { initials } from '../utils/formatters.js';
-import { checkHealth, fetchDocuments, deleteDocument } from '../services/apiClient.js';
+import { checkHealth, fetchDocuments, deleteDocument, loadCorporateDocuments } from '../services/apiClient.js';
 import {
   subscribeDocuments,
   getDocumentsState,
@@ -112,6 +112,35 @@ function setupUpload() {
   });
 }
 
+function setupCorporateLoad() {
+  const button = qs('#load-corporate');
+  const originalHtml = button.innerHTML;
+
+  button.addEventListener('click', async () => {
+    button.disabled = true;
+    button.innerHTML = '<span aria-hidden="true">⏳</span> Cargando…';
+
+    try {
+      const result = await loadCorporateDocuments();
+      const { documents } = await fetchDocuments();
+      setDocuments(documents);
+
+      if (result.total_loaded > 0) {
+        const extra =
+          result.total_already_existing > 0 ? ` (${result.total_already_existing} ya estaban cargados)` : '';
+        showToast(`Se cargaron ${result.total_loaded} documento(s) corporativo(s) nuevo(s).${extra}`, 'success');
+      } else {
+        showToast('La documentación corporativa ya estaba cargada por completo.', 'info');
+      }
+    } catch (error) {
+      showToast(error.message || 'No se pudo cargar la documentación corporativa.', 'error');
+    } finally {
+      button.disabled = false;
+      button.innerHTML = originalHtml;
+    }
+  });
+}
+
 function setupClearChat() {
   const button = qs('#clear-chat');
 
@@ -154,6 +183,7 @@ function setupDrawer() {
 export async function initSidebar() {
   setupLogo();
   setupUpload();
+  setupCorporateLoad();
   setupClearChat();
   setupDrawer();
   subscribeDocuments(renderDocuments);

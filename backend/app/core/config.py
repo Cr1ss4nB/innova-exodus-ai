@@ -55,6 +55,11 @@ class Settings(BaseSettings):
         """Ruta absoluta del archivo de registro de documentos."""
         return BASE_DIR / "data" / "documents_registry.json"
 
+    @property
+    def corporate_documents_path(self) -> Path:
+        """Ruta absoluta de los PDFs corporativos base (resources/documents, fuera de backend/)."""
+        return BASE_DIR.parent / "resources" / "documents"
+
 
 @lru_cache
 def get_settings() -> Settings:

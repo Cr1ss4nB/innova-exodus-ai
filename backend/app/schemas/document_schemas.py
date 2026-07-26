@@ -41,3 +41,12 @@ class DocumentDeleteResponse(BaseModel):
     filename: str
     vectors_removed: int
     message: str
+
+
+class CorporateDocumentsLoadResponse(BaseModel):
+    """Resumen de la carga automática de la documentación corporativa base."""
+
+    loaded: list[DocumentResponse]
+    already_existing: list[str]
+    total_loaded: int
+    total_already_existing: int

@@ -123,6 +123,10 @@
   color: var(--color-ink-faint);
 }
 
+.corporate-load-row {
+  padding: 0 var(--space-5) var(--space-3);
+}
+
 .document-list {
   flex: 1;
   overflow-y: auto;

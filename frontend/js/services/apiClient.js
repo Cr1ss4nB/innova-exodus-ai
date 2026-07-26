@@ -43,6 +43,20 @@ export async function uploadDocument(file) {
 }
 
 /**
+ * Procesa e indexa los PDFs corporativos de resources/documents/, omitiendo
+ * automaticamente los que ya esten registrados.
+ * @returns {Promise<{loaded: import('../types.js').DocumentRecord[], already_existing: string[], total_loaded: number, total_already_existing: number}>}
+ */
+export async function loadCorporateDocuments() {
+  const response = await fetch(`${API_ROUTES.documents}/corporate`, {
+    method: 'POST',
+  });
+
+  if (!response.ok) throw await toApiError(response);
+  return response.json();
+}
+
+/**
  * Elimina un documento y sus vectores asociados.
  * @param {string} documentId
  */

@@ -1,11 +1,17 @@
 from fastapi import APIRouter, File, UploadFile, status
 from fastapi.responses import FileResponse
 
-from app.schemas.document_schemas import DocumentDeleteResponse, DocumentListResponse, DocumentResponse
+from app.schemas.document_schemas import (
+    CorporateDocumentsLoadResponse,
+    DocumentDeleteResponse,
+    DocumentListResponse,
+    DocumentResponse,
+)
 from app.services.document_service import (
     delete_document,
     get_document_file_path,
     list_documents,
+    load_corporate_documents,
     upload_document,
 )
 
@@ -22,6 +28,19 @@ async def upload_document_endpoint(file: UploadFile = File(...)) -> DocumentResp
         content=content,
     )
     return DocumentResponse.from_record(record)
+
+
+@router.post("/corporate", response_model=CorporateDocumentsLoadResponse)
+def load_corporate_documents_endpoint() -> CorporateDocumentsLoadResponse:
+    """Procesa e indexa los PDFs de resources/documents/, omitiendo automáticamente
+    (sin error) los que ya estén registrados según su hash SHA-256."""
+    loaded, already_existing = load_corporate_documents()
+    return CorporateDocumentsLoadResponse(
+        loaded=[DocumentResponse.from_record(record) for record in loaded],
+        already_existing=already_existing,
+        total_loaded=len(loaded),
+        total_already_existing=len(already_existing),
+    )
 
 
 @router.get("", response_model=DocumentListResponse)

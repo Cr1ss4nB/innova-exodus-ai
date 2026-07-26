@@ -101,3 +101,47 @@ def get_document_file_path(document_id: str) -> tuple[Path, str]:
         raise DocumentNotFoundError(f"El archivo físico del documento no se encontró en disco: {document_id}")
 
     return file_path, record.filename
+
+
+def load_corporate_documents() -> tuple[list[DocumentRecord], list[str]]:
+    """Procesa todos los PDFs de resources/documents/, reutilizando exactamente el mismo
+    pipeline de subida (validación, hash, procesamiento e indexación) que usa upload_document.
+
+    Los documentos cuyo contenido (hash SHA-256) ya esté registrado se omiten automáticamente,
+    sin generar error — es el mismo mecanismo de duplicados de la Etapa 3.5, aplicado aquí a
+    una carga por lotes en vez de a una subida individual.
+
+    La ruta se resuelve de forma absoluta a partir de la ubicación del propio repositorio
+    (ver Settings.corporate_documents_path), así que funciona igual en local y en el servidor
+    desplegado, sin ninguna configuración adicional por entorno.
+    """
+    settings = get_settings()
+    corporate_dir = settings.corporate_documents_path
+
+    loaded: list[DocumentRecord] = []
+    already_existing: list[str] = []
+
+    if not corporate_dir.exists():
+        logger.warning("No se encontró la carpeta de documentos corporativos: %s", corporate_dir)
+        return loaded, already_existing
+
+    for pdf_path in sorted(corporate_dir.glob("*.pdf")):
+        content = pdf_path.read_bytes()
+
+        try:
+            record = upload_document(
+                filename=pdf_path.name,
+                content_type="application/pdf",
+                content=content,
+            )
+            loaded.append(record)
+        except DuplicateDocumentError:
+            already_existing.append(pdf_path.name)
+
+    logger.info(
+        "Carga de documentación corporativa: %d nuevo(s), %d ya existente(s)",
+        len(loaded),
+        len(already_existing),
+    )
+
+    return loaded, already_existing
