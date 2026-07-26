@@ -614,7 +614,42 @@ El asistente comprende que la consulta hace referencia a la respuesta anterior y
 
 ## Despliegue en Oracle Cloud Infrastructure (OCI)
 
+Para la publicación de Innova Exodus AI se eligió **Oracle Cloud Infrastructure (OCI)**, aprovechando su capa gratuita para alojar la aplicación de forma pública como requería el Challenge Alura Agente.
 
+El despliegue se realizó sobre una instancia de cómputo con Ubuntu, a la que se accedió por conexión SSH para clonar el repositorio directamente desde GitHub e instalar el entorno necesario para ejecutar el proyecto.
+
+Sobre esa instancia:
+
+- **Nginx** se configuró como servidor web y proxy inverso: sirve el frontend de forma directa y redirige las peticiones de la API hacia el backend, permitiendo que ambos convivan bajo el mismo dominio sin problemas de CORS.
+- El **backend (FastAPI/Uvicorn)** se ejecuta como un **servicio administrado con systemd**, lo que garantiza que permanezca activo de forma permanente, se reinicie automáticamente ante cualquier fallo y arranque solo al reiniciar la instancia, sin depender de mantener una sesión abierta.
+- Se configuró **HTTPS mediante Certbot (Let's Encrypt)**, integrado directamente con Nginx, obteniendo un certificado SSL válido y con renovación automática.
+- Para acceder mediante un nombre amigable en lugar de la dirección IP, se utilizó **DuckDNS**, un servicio gratuito de subdominios, sobre el cual se emitió el certificado HTTPS.
+
+Como resultado, la aplicación completa (frontend, backend, pipeline RAG y chat) queda disponible públicamente a través de un dominio propio y seguro, accesible desde cualquier navegador sin configuración adicional.
+
+### Evidencias del despliegue
+
+> <img width="1917" height="935" alt="image" src="https://github.com/user-attachments/assets/cb5c0158-9ba3-4ed3-9310-1bbd63d8e479" />
+
+Instancia de cómputo `innova-exodus-vm` en estado *Running*, sobre Ubuntu 20.04 (Canonical), shape `VM.Standard.E5.Flex` con 1 OCPU y 12 GB de RAM, en la región Colombia Central (Bogotá). Se muestra la IP pública `157.137.219.21` y el usuario `ubuntu` utilizado para la conexión SSH.
+
+> <img width="1917" height="861" alt="image" src="https://github.com/user-attachments/assets/900211c6-c211-40ff-bb76-8fbf7633e6ed" />
+
+Red virtual en la nube (VCN) `vcn-innova-exodus` con su subred pública `subnet-innova` (bloque `10.0.0.0/24`), donde se encuentra alojada la instancia de cómputo.
+
+> <img width="1917" height="927" alt="image" src="https://github.com/user-attachments/assets/be528030-58f2-4969-942b-42328f4fce9c" />
+
+Lista de seguridad por defecto de la VCN, mostrando las reglas de ingreso configuradas para permitir tráfico TCP en los puertos 80 (HTTP) y 443 (HTTPS), además del puerto 22 (SSH) necesario para la administración remota.
+
+> <img width="1917" height="1032" alt="image" src="https://github.com/user-attachments/assets/c23ba843-a909-4f36-a9c2-d231a6ab0b79" />
+
+Aplicación desplegada y funcionando en `https://exodus-ai.duckdns.org`, mostrando el chat del asistente respondiendo con base en la documentación corporativa indexada, incluyendo las referencias a los documentos y páginas fuente utilizadas.
+
+### Acceso a la aplicación
+
+[Exodus AI](https://exodus-ai.duckdns.org/)
+
+> Debido a las limitaciones de la capa gratuita (Free Tier) de Oracle Cloud Infrastructure, la disponibilidad de la aplicación desplegada puede variar con el tiempo. Si el enlace anterior no se encuentra disponible, el proyecto puede ejecutarse localmente siguiendo las instrucciones de instalación descritas anteriormente en este repositorio.
 
 [Volver a la tabla de contenidos](#tabla-de-contenidos)
 
