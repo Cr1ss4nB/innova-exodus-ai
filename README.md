@@ -25,6 +25,7 @@ El objetivo del desafío consiste en construir un agente de inteligencia artific
 - [Ejecución](#ejecución)
 - [Ejemplos de Uso](#ejemplos-de-uso)
 - [Despliegue en Oracle Cloud Infrastructure (OCI)](#despliegue-en-oracle-cloud-infrastructure-oci)
+- [Limitaciones conocidas](#limitaciones-conocidas)
 - [Autor](#autor)
 - [Licencia](#licencia)
 
@@ -139,6 +140,9 @@ innova-exodus-ai/
 ├── .gitignore
 ├── LICENSE
 ├── README.md
+├── .github/
+│   ├── workflows
+│   │   ├── deploy.yml
 ├── backend/
 │   ├── .env.example
 │   ├── app/
@@ -531,7 +535,7 @@ Desde esta interfaz podrás:
 Una vez abierta la aplicación, puedes realizar las siguientes pruebas para verificar que todo funciona correctamente.
 
 1. Envía un saludo como **"Hola"**.
-2. Carga uno o varios documentos PDF desde la barra lateral.
+2. Carga uno o varios documentos PDF desde la barra lateral. Los documentos de la empresa ficticia Innova Exodus se encuentran en "resources/documents", aunque igualmente se pueden cargar los archivos desde la interfaz con el botón **"Cargar documentación corporativa"**.
 3. Espera a que finalice el proceso de indexación.
 4. Realiza una pregunta relacionada con la documentación cargada.
 5. Verifica que la respuesta incluya las referencias a los documentos utilizados.
@@ -610,7 +614,23 @@ El asistente comprende que la consulta hace referencia a la respuesta anterior y
 
 ## Despliegue en Oracle Cloud Infrastructure (OCI)
 
+
+
 [Volver a la tabla de contenidos](#tabla-de-contenidos)
+
+---
+
+## Limitaciones conocidas
+
+Actualmente la aplicación utiliza una única base de conocimiento compartida para todos los usuarios.
+
+Los documentos cargados desde la interfaz se almacenan en el servidor y pasan a formar parte de la base de conocimiento utilizada por el sistema RAG, por lo que cualquier usuario que acceda a la aplicación podrá consultarlos mientras permanezcan registrados.
+
+Esta decisión fue adoptada para mantener una arquitectura simple, sin autenticación ni gestión de usuarios, acorde con el alcance del proyecto y del Challenge.
+
+Para realizar demostraciones, el repositorio incluye la documentación corporativa de ejemplo en la carpeta `resources/documents`, la cual puede cargarse desde la interfaz mediante el botón **"Cargar documentación corporativa"**.
+
+Como mejora futura, podría incorporarse autenticación de usuarios y aislamiento de documentos por usuario o espacio de trabajo, permitiendo que cada usuario mantenga una base de conocimiento independiente.
 
 ---
 
