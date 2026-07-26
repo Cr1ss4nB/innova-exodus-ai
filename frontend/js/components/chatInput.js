@@ -35,6 +35,7 @@ async function submitQuestion(textarea) {
     showToast(message, 'error');
   } finally {
     setThinking(false);
+    textarea.focus();
   }
 }
 
